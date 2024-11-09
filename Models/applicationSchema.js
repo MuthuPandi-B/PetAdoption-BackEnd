@@ -25,6 +25,14 @@ const applicationSchema = new mongoose.Schema({
         enum: ["Pending", "Approved", "Rejected"],
         default: "Pending",
     },
+    creator: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      
+      
+    },
+
+    
     });
     export default mongoose.model("Application", applicationSchema);
 

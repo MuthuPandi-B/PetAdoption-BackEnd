@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Application from "../Models/applicationSchema.js";
 import sendEmail from "../Utils/emailService.js";
+import User from "../Models/userSchema.js";
 export const createApplication = async (req, res) => {
     const { petName, petBread, petAge, petGender, petDescription } = req.body;
     try {
@@ -9,7 +10,8 @@ export const createApplication = async (req, res) => {
             petBread,
             petAge,
             petGender,
-            petDescription
+            petDescription,
+            creator,
 }
         );
         await application.save();
@@ -32,6 +34,7 @@ export const editApplication = async (req, res) => {
         application.petAge = petAge;
         application.petGender = petGender;
         application.petDescription = petDescription;
+     
         await application.save();
         res.status(200).json({ message: "Application updated successfully" });
     } catch (error) {
@@ -42,14 +45,23 @@ export const editApplication = async (req, res) => {
 export const approveApplication = async (req, res) => {
     const { id } = req.params;
     try {
+        
         const application = await Application.findById(id);
         if (!application) {
             return res.status(404).json({ message: "Application not found" });
         }
+        console.log(application);
+        const appcreator = await User.findById(application.creator).select("email");
+        if (!appcreator) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        console.log(appcreator);
+        
         application.status = "Approved";
         await application.save();
         await sendEmail(
-            email,
+          appcreator.email,
+           console.log(user.email),
             "Application Approved",
             "Your application has been approved."
         )
