@@ -3,17 +3,23 @@ import Application from "../Models/applicationSchema.js";
 import sendEmail from "../Utils/emailService.js";
 import User from "../Models/userSchema.js";
 export const createApplication = async (req, res) => {
-    const { petName, petBread, petAge, petGender, petDescription } = req.body;
+    const { petName, petBreed, petAge, petGender, petDescription } = req.body;
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    }
     try {
         const application = new Application({
             petName,
-            petBread,
+            petBreed,
             petAge,
             petGender,
             petDescription,
-            creator,
+            creator:userId,
 }
         );
+        console.log("application:",application.creator);
         await application.save();
         res.status(200).json({ message: "Application submitted successfully" });
     } catch (error) {
@@ -23,14 +29,14 @@ export const createApplication = async (req, res) => {
 
 export const editApplication = async (req, res) => {
     const { id } = req.params;
-    const { petName, petBread, petAge, petGender, petDescription } = req.body;
+    const { petName, petBreed, petAge, petGender, petDescription } = req.body;
     try {
         const application = await Application.findById(id);
         if (!application) {
             return res.status(404).json({ message: "Application not found" });
         }
         application.petName = petName;
-        application.petBread = petBread;
+        application.petBreed = petBreed;
         application.petAge = petAge;
         application.petGender = petGender;
         application.petDescription = petDescription;
@@ -48,20 +54,30 @@ export const approveApplication = async (req, res) => {
         
         const application = await Application.findById(id);
         if (!application) {
+            console.log("application not fount:",id);
+            
             return res.status(404).json({ message: "Application not found" });
         }
-        console.log(application);
-        const appcreator = await User.findById(application.creator).select("email");
-        if (!appcreator) {
+     console.log("found:",application);
+     if(!application.creator){
+        console.log("creator not found:");
+        return res.status(404).json({ message: "Creator not found" });
+     }
+        console.log("creator found:",application.creator);
+        
+     
+        const user = await User.findById(application.creator).select("email");
+        if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        console.log(appcreator);
+       console.log("user found:",user);
+       
         
         application.status = "Approved";
         await application.save();
         await sendEmail(
-          appcreator.email,
-           console.log(user.email),
+          user.email,
+         
             "Application Approved",
             "Your application has been approved."
         )
