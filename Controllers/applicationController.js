@@ -94,10 +94,18 @@ export const rejectApplication = async (req, res) => {
         if (!application) {
             return res.status(404).json({ message: "Application not found" });
         }
+        if(!application.creator){
+            return res.status(404).json({ message: "Creator not found" });
+         }
+        const user = await User.findById(application.creator).select("email");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+    
         application.status = "Rejected";
         await application.save();
         await sendEmail(
-            email,
+           user.email,
             "Application Rejected",
             "Your application has been rejected."
         )
