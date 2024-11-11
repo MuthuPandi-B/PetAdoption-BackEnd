@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import Application from "../Models/applicationSchema.js";
 import sendEmail from "../Utils/emailService.js";
 import User from "../Models/userSchema.js";

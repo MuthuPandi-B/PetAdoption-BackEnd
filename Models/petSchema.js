@@ -4,7 +4,7 @@ import mongoose from "mongoose";
         type: String,
         required: true
     },
-    petBread:{
+    petBreed:{
         type: String,
         required: true
     },
