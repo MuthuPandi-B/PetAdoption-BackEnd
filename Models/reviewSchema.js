@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
 const reviewSchema = new mongoose.Schema({
+   
     rating: {
         type: Number,
-        required: true
+        required: true,
+        min: 1,
+        max: 5
     },
-    review: {
+    comment: {
         type: String,
         required: true
     },
@@ -18,6 +21,14 @@ const reviewSchema = new mongoose.Schema({
         ref: "Pet",
         required: true
     },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    reported: {
+        type: Boolean,
+        default: false
+    },
     
-})
+});
 export default mongoose.model("Review", reviewSchema);
