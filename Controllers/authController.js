@@ -39,16 +39,14 @@ export const loginUser = async (req, res) => {
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
-     
     });
+    user.token = token;
 
-  
     await user.save();
 
- 
-    res.status(200).json({message: "Login successful", token});
+    res.status(200).json({ message: "Login successful", token:token,role:user.role });
   } catch (error) {
-    res.status(500).json({ message:error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 export const forgotPassword = async (req, res) => {
@@ -64,12 +62,11 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000;
     await user.save();
     //send mail notification
-    
-  
-      await sendEmail(
-        email,
-        "Password Reset Link",
-        `Dear ${user.name}
+
+    await sendEmail(
+      email,
+      "Password Reset Link",
+      `Dear ${user.name}
             We received a request to reset your password for your account. 
                Please click the link below to set a new password. 
               This link is only valid for the next hour:
@@ -77,12 +74,9 @@ export const forgotPassword = async (req, res) => {
         If you didn’t request this, you can ignore this email. Your password will remain unchanged.
 
       Thank you,    
-      The Password Reset Team`,
-      );
+      The Password Reset Team`
+    );
 
-    
-  
-    
     res.status(200).json({ message: "Password reset email sent" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -90,28 +84,28 @@ export const forgotPassword = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-    const { resetToken } = req.params;
-    const { password } = req.body;
-  
-    try {
-      const user = await User.findOne({
-        resetPasswordToken: { $exists: true },
-        resetPasswordExpires: { $gt: Date.now() },
-      });
-      if (!user)
-        return res.status(400).json({ message: "Invalid or expired token" });
-  
-      const isMatch = await bcrypt.compare(resetToken, user.resetPasswordToken);
-      if (!isMatch) return res.status(400).json({ message: "Invalid Token" });
-  
-      // Update password and clear reset token
-      user.password = await bcrypt.hash(password, 10);
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpires = undefined;
-      await user.save();
-  
-      res.status(200).json({ message: "Password updated successfully" });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  };
+  const { resetToken } = req.params;
+  const { password } = req.body;
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: { $exists: true },
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+    if (!user)
+      return res.status(400).json({ message: "Invalid or expired token" });
+
+    const isMatch = await bcrypt.compare(resetToken, user.resetPasswordToken);
+    if (!isMatch) return res.status(400).json({ message: "Invalid Token" });
+
+    // Update password and clear reset token
+    user.password = await bcrypt.hash(password, 10);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

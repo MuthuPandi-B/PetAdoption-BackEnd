@@ -16,7 +16,7 @@ import mongoose from "mongoose";
         type: String,
         required: true  
     },
-    petColor: {
+    petColour: {
         type: String,
         required: true
     },
@@ -24,9 +24,21 @@ import mongoose from "mongoose";
         type: String,
         required: true
     },
+    media: {
+        type: String,
+        required: true
+    },
+    petLocation:{
+        type: String,
+        required: true
+    },
     petMedicalhistory: {
         type: String,
         required: true
     },  
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
  })
  export default mongoose.model("Pet", petSchema);

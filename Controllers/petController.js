@@ -6,7 +6,7 @@ import User from "../Models/userSchema.js";
 
 dotenv.config();
 export const createPet = async (req, res) => {
-    const {petName ,petBreed,petAge,petSize,petColor,petMedicalhistory,petGender} = req.body; 
+    const {petName ,petBreed,petAge,petSize,petColour,petLocation,petMedicalhistory,petGender} = req.body; 
     const userId = req.user._id;
     const user = await User.findById(userId);
     if (!user) {
@@ -18,7 +18,8 @@ export const createPet = async (req, res) => {
       petBreed,
       petAge,
       petSize,
-      petColor,
+      petColour,
+      petLocation,
       petMedicalhistory,
       petGender,
     });
@@ -29,9 +30,16 @@ catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-export const getPet = async (req, res) => {
+export const getPets = async (req, res) => {
+  const{breed,age,size,location} = req.query;
+  let query = {};
+  if (breed) query.petBreed = breed;
+  if (age) query.petAge = age;
+  if (size) query.petSize = size;
+  if (location) query.petLocation = location;
+  
   try {
-    const pets = await Pet.find();
+    const pets = await Pet.find(query);
     res.status(200).json(pets);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -52,7 +60,7 @@ export const deletePet = async (req, res) => {
 
 export const editPet = async (req, res) => {
   const { id } = req.params;
-  const { petName, petBreed, petAge, petSize, petColour, petMedicalhistory, petGender } = req.body;
+  const { petName, petBreed, petAge, petSize, petColour,petLocation, petMedicalhistory, petGender } = req.body;
   try {
     const pet = await Pet.findById(id);
     if (!pet) {
@@ -63,6 +71,7 @@ export const editPet = async (req, res) => {
     pet.petAge = petAge;
     pet.petSize = petSize;
     pet.petColour = petColour;
+    petLocation = petLocation;
     pet.petMedicalhistory = petMedicalhistory;
     pet.petGender = petGender;
     await pet.save();
