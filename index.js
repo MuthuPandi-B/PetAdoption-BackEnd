@@ -8,7 +8,7 @@ import petRoutes from "./Routers/petRoutes.js";
 import reviewRoutes from "./Routers/reviewRoutes.js";
 import messageRoutes from "./Routers/messageRoutes.js";
 import appointmentRoutes from "./Routers/appointmentRoutes.js";
-
+import userRoutes from "./Routers/userRoutes.js";
 dotenv.config();
 const app = express();
 
@@ -25,6 +25,7 @@ app.use("/api/pets", petRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use("/api",userRoutes);
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

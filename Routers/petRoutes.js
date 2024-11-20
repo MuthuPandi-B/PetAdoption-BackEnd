@@ -1,15 +1,16 @@
 import express from "express";
-import { createPet, editPet, deletePet,getPets } from "../Controllers/petController.js";
+import { createPet, editPet, deletePet, getPets, getPetById } from "../Controllers/petController.js";
 import { adminMiddleware, authMiddleware } from "../Middleware/authMiddleware.js";
 import { loginUser } from "../Controllers/authController.js";
-
-
+import upload from "../Config/Multer.js"; // Import the multer configuration
 
 const router = express.Router();
+
 router.post("/login", loginUser);
-router.post("/create", authMiddleware,adminMiddleware, createPet);
-router.put("/edit/:id", authMiddleware,adminMiddleware, editPet);
-router.delete("/delete/:id",authMiddleware, adminMiddleware, deletePet);
-router.get("/get", getPets);
-router.get("/get/:id", getPets);
+router.post("/create", authMiddleware, adminMiddleware, upload.single('media'), createPet); // Add upload middleware
+router.put("/edit/:id", authMiddleware, adminMiddleware, upload.single('media'), editPet); // Add upload middleware
+router.delete("/delete/:id", authMiddleware, adminMiddleware, deletePet);
+router.get("/", getPets); // Adjusted path to '/pets'
+router.get("/:id",authMiddleware ,getPetById); // Adjusted path to '/pets/:id'
+
 export default router;

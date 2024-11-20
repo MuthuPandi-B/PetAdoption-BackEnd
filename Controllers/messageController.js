@@ -1,39 +1,29 @@
-import Message from '../Models/messageSchema.js';
-import User from '../Models/userSchema.js';
+import Message from "../Models/messageSchema.js";
+import User from "../Models/userSchema.js";
 
+// Send Message
 export const sendMessage = async (req, res) => {
-  const { receiverId, content } = req.body;
+  const { receiverId, message } = req.body;
   const senderId = req.user._id;
 
   try {
-    const receiver = await User.findById(receiverId);
-    if (!receiver) {
-      return res.status(404).json({ message: 'Receiver not found' });
-    }
-
-    const message = new Message({
-      sender: senderId,
-      receiver: receiverId,
-      content
-    });
-
-    await message.save();
-    res.status(201).json({ message: 'Message sent successfully', message });
+    const newMessage = new Message({ sender: senderId, receiver: receiverId, message });
+    await newMessage.save();
+    res.status(200).json({ message: "Message sent successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const getMessages = async (req, res) => {
+// Get Conversations
+export const getConversations = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const messages = await Message.find({ $or: [{ sender: userId }, { receiver: userId }] })
-      .populate('sender', 'name')
-      .populate('receiver', 'name')
-      .sort({ timestamp: -1 });
-
-    res.status(200).json(messages);
+    const conversations = await Message.find({
+      $or: [{ sender: userId }, { receiver: userId }],
+    }).populate('sender', 'name').populate('receiver', 'name');
+    res.status(200).json(conversations);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

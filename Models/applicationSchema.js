@@ -8,18 +8,27 @@ const applicationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    petAge: {
+    applicantName: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    phone: {
         type: Number,
         required: true
     },
-    petGender: {
+    address
+    : {
         type: String,
         required: true
     },
-    petDescription: {
+    reason: {
         type: String,
         required: true
-    },
+    },  
     status: {
         type: String,
         enum: ["Pending", "Approved", "Rejected"],
