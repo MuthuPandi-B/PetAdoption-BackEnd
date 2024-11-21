@@ -96,6 +96,7 @@ export const editPet = async (req, res) => {
     pet.petLocation = petLocation;
     pet.petMedicalhistory = petMedicalhistory;
     pet.petGender = petGender;
+    pet.petLocation = petLocation;
 
     if (req.file && req.file.path) {
       pet.media = req.file.path;
