@@ -1,4 +1,5 @@
-import FosterPet from '../Models/fosterPetSchema.js';
+import FosterPet from '../models/fosterPetSchema.js';
+
 // Create Foster Pet
 export const createFosterPet = async (req, res) => {
   const { name, breed, age, medicalHistory } = req.body;
@@ -19,62 +20,108 @@ export const createFosterPet = async (req, res) => {
   }
 };
 
-
 // Get Foster Pets by Shelter
 export const getFosterPetsByShelter = async (req, res) => {
-  const { shelterId } = req.params;
   try {
-    const fosterPets = await FosterPet.find({ shelter: shelterId }).populate('fosterParent', 'name email');
+    const fosterPets = await FosterPet.find({ shelter: req.user._id }).populate('fosterParent', 'name email');
     res.status(200).json(fosterPets);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get Foster Pet by ID
-export const getFosterPetById = async (req, res) => {
-  const { id } = req.params;
+// Get Pending Foster Pets for Foster
+export const getPendingFosterPets = async (req, res) => {
   try {
-    const fosterPet = await FosterPet.findById(id).populate('fosterParent', 'name email');
-    if (!fosterPet) {
-      return res.status(404).json({ message: 'Foster pet not found' });
-    }
-    res.status(200).json(fosterPet);
+    const fosterPets = await FosterPet.find({ status: 'Pending' }).populate('shelter', 'name email');
+    res.status(200).json(fosterPets);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Update Foster Pet Status
-export const updateFosterPetStatus = async (req, res) => {
+// Request to Foster
+export const requestToFoster = async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
   try {
     const fosterPet = await FosterPet.findById(id);
     if (!fosterPet) {
       return res.status(404).json({ message: 'Foster pet not found' });
     }
-    fosterPet.status = status;
+    fosterPet.status = 'Requested';
+    fosterPet.fosterParent = req.user._id;
     await fosterPet.save();
-    res.status(200).json({ message: 'Foster pet status updated successfully', fosterPet });
+    res.status(200).json({ message: 'Request to foster sent successfully', fosterPet });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Assign Foster Parent
-export const assignFosterParent = async (req, res) => {
+// Update Notes by Foster
+export const updateFosterNotes = async (req, res) => {
   const { id } = req.params;
-  const { fosterParentId } = req.body;
+  const { note } = req.body;
   try {
     const fosterPet = await FosterPet.findById(id);
     if (!fosterPet) {
       return res.status(404).json({ message: 'Foster pet not found' });
     }
-    fosterPet.fosterParent = fosterParentId;
+    if (fosterPet.fosterParent.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    fosterPet.notes = note;
+    await fosterPet.save();
+    res.status(200).json({ message: 'Note updated successfully', fosterPet });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Request Return by Foster
+export const requestReturn = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const fosterPet = await FosterPet.findById(id);
+    if (!fosterPet) {
+      return res.status(404).json({ message: 'Foster pet not found' });
+    }
+    if (fosterPet.fosterParent.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    fosterPet.status = 'Returned';
+    await fosterPet.save();
+    res.status(200).json({ message: 'Return requested successfully', fosterPet });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Accept Foster Request by Shelter
+export const acceptFosterRequest = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const fosterPet = await FosterPet.findById(id);
+    if (!fosterPet) {
+      return res.status(404).json({ message: 'Foster pet not found' });
+    }
+    if (fosterPet.shelter.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
     fosterPet.status = 'In Foster Care';
     await fosterPet.save();
-    res.status(200).json({ message: 'Foster parent assigned successfully', fosterPet });
+    res.status(200).json({ message: 'Foster request accepted successfully', fosterPet });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// Get Foster Pets for Foster Parent
+export const getFosterPetsForFoster = async (req, res) => {
+  try {
+    const fosterPets = await FosterPet.find({
+      fosterParent: req.user._id,
+      status: { $in: ['Requested', 'In Foster Care', 'Returned'] }
+    }).populate('shelter', 'name email');
+    res.status(200).json(fosterPets);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
