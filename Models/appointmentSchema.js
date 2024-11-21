@@ -5,7 +5,7 @@ const appointmentSchema = new mongoose.Schema({
   time: { type: String, required: true },
   message: { type: String, required: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  pet: { type: mongoose.Schema.Types.ObjectId, ref: "Pet", required: true },
+
   status: {
     type: String,
     enum: ["Pending", "Confirmed", "Completed"],
