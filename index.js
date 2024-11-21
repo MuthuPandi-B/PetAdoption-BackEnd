@@ -9,6 +9,9 @@ import reviewRoutes from "./Routers/reviewRoutes.js";
 import messageRoutes from "./Routers/messageRoutes.js";
 import appointmentRoutes from "./Routers/appointmentRoutes.js";
 import userRoutes from "./Routers/userRoutes.js";
+import favoriteRoutes from "./Routers/favoriteRoutes.js";
+import fosterPetRoutes from "./Routers/fosterPetRoutes.js";
+import adoptionRoutes from "./Routers/adoptionRoutes.js";
 dotenv.config();
 const app = express();
 
@@ -26,6 +29,10 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use("/api",userRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use('/api/fosterpets', fosterPetRoutes);
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

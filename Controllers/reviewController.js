@@ -1,64 +1,74 @@
-import Review from '../Models/reviewSchema.js';
-import Pet from '../Models/petSchema.js';
-import User from '../Models/userSchema.js';
+import Review from "../Models/reviewSchema.js";
+import User from "../Models/userSchema.js";
 
-
-
+// Create a review
 export const createReview = async (req, res) => {
-  const { rating, comment } = req.body;
-  const { petId } = req.params;
-  const userId = req.user._id;
+  const { rating, comment, reviewType } = req.body;
+  const user = req.user._id;
 
   try {
-    const pet = await Pet.findById(petId);
-    if (!pet) {
-      return res.status(404).json({ message: 'Pet not found' });
-    }
+    const newReview = new Review({ user, rating, comment, reviewType });
+    await newReview.save();
 
-    const review = new Review({
-      user: userId,
-      pet: petId,
-      rating,
-      comment,
-    });
-
-    await review.save();
-    res.status(201).json({ message: 'Review created successfully', review });
+    res.status(201).json({ message: "Review added successfully", review: newReview });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+// Get all reviews
 export const getReviews = async (req, res) => {
   try {
-    const { petId } = req.query;
-    let filter = {};
-
-    if (petId) filter.pet = petId;
-
-    const reviews = await Review.find(filter)
-      .populate('user', 'name')
-      .populate('pet', 'petName');
-
+    const reviews = await Review.find().populate("user", "name");
     res.status(200).json(reviews);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const reportReview = async (req, res) => {
+// Edit a review
+export const editReview = async (req, res) => {
+  const { id } = req.params;
+  const { rating, comment } = req.body;
+
+  try {
+    const review = await Review.findById(id);
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    if (review.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "You are not authorized to edit this review" });
+    }
+
+    review.rating = rating;
+    review.comment = comment;
+    await review.save();
+
+    res.status(200).json({ message: "Review updated successfully", review });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete a review
+export const deleteReview = async (req, res) => {
   const { id } = req.params;
 
   try {
     const review = await Review.findById(id);
+
     if (!review) {
-      return res.status(404).json({ message: 'Review not found' });
+      return res.status(404).json({ message: "Review not found" });
     }
 
-    review.reported = true;
-    await review.save();
+    if (review.user.toString() !== req.user._id.toString() && req.user.role !== "shelter") {
+      return res.status(403).json({ message: "You are not authorized to delete this review" });
+    }
 
-    res.status(200).json({ message: 'Review reported successfully' });
+    await Review.deleteOne({ _id: id });
+    res.status(200).json({ message: "Review deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

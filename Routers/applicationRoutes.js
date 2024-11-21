@@ -1,5 +1,5 @@
 import express from "express";
-import { approveApplication, createApplication, deleteApplication, editApplication, getAllApplications, getApplicationById, getApplicationByUserId, rejectApplication, scheduleMeetAndGreet,  } from "../Controllers/applicationController.js";
+import { approveApplication, createApplication, deleteApplication, editApplication, getAllApplications, getApplicationById, getApplicationByUserId, rejectApplication, requestAdditionalInfo, scheduleMeetAndGreet,  } from "../Controllers/applicationController.js";
 import { adminMiddleware, authMiddleware } from "../Middleware/authMiddleware.js";
 import{ loginUser} from "../Controllers/authController.js";
 const router = express.Router();
@@ -12,5 +12,6 @@ router.put("/edit/:id",authMiddleware ,editApplication);
 router.get("/getall",authMiddleware,adminMiddleware, getAllApplications);
 router.get("/get/:id",authMiddleware,getApplicationById);
 router.get("/user",authMiddleware, getApplicationByUserId);
-router.get("/scheduled/:id",authMiddleware,adminMiddleware, scheduleMeetAndGreet);
+router.post("/scheduled/:id",authMiddleware,adminMiddleware, scheduleMeetAndGreet);
+router.post("/request-info/:id",authMiddleware,adminMiddleware, requestAdditionalInfo);
 export default router;

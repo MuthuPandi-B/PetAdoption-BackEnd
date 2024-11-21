@@ -1,5 +1,5 @@
 import express from "express";
-import { createPet, editPet, deletePet, getPets, getPetById } from "../Controllers/petController.js";
+import { createPet, editPet, deletePet, getPets, getPetById,  } from "../Controllers/petController.js";
 import { adminMiddleware, authMiddleware } from "../Middleware/authMiddleware.js";
 import { loginUser } from "../Controllers/authController.js";
 import upload from "../Config/Multer.js"; // Import the multer configuration
