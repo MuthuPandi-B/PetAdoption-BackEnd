@@ -75,7 +75,7 @@ export const forgotPassword = async (req, res) => {
 
       Thank you,    
       The Password Reset Team
-      Pet Adoption Platform`
+      Adopt-A-Pet Platform`
     );
 
     res.status(200).json({ message: "Password reset email sent" });
