@@ -1,4 +1,4 @@
-import Appointment from '../models/appointmentSchema.js';
+import Appointment from '../Models/appointmentSchema.js';
 
 // Schedule Appointment
 export const scheduleAppointment = async (req, res) => {
