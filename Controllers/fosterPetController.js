@@ -1,4 +1,4 @@
-import FosterPet from '../models/fosterPetSchema.js';
+import FosterPet from '../Models/fosterPetSchema.js';
 
 // Create Foster Pet
 export const createFosterPet = async (req, res) => {
