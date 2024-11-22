@@ -1,7 +1,7 @@
 
 import express from 'express';
 import { createFosterPet, getFosterPetsByShelter, getPendingFosterPets, requestToFoster, updateFosterNotes, requestReturn, acceptFosterRequest, getFosterPetsForFoster } from '../Controllers/fosterPetController.js';
-import { authMiddleware, adminMiddleware } from '../middleware/authMiddleware.js';
+import { authMiddleware, adminMiddleware } from '../Middleware/authMiddleware.js';
 
 const router = express.Router();
 
