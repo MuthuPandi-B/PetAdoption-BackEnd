@@ -43,6 +43,9 @@ const applicationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  shelternotes: {
+    type: String,
+  },
   meetAndGreetDate: {
     type: Date,
   },

@@ -70,7 +70,7 @@ export const forgotPassword = async (req, res) => {
             We received a request to reset your password for your account. 
                Please click the link below to set a new password. 
               This link is only valid for the next hour:
-        https://localhost:5000/reset-password/${resetToken}
+        http://localhost:5175/reset-password/${resetToken}
         If you didn’t request this, you can ignore this email. Your password will remain unchanged.
 
       Thank you,    

@@ -3,7 +3,7 @@ import sendEmail from "../Utils/emailService.js";
 import User from "../Models/userSchema.js";
 
 export const createApplication = async (req, res) => {
-  const { petName, petBreed, applicantName, email, phone, address, reason } = req.body;
+  const { petName, petBreed, applicantName, email, phone, address, reason ,shelternotes} = req.body;
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user) {
@@ -18,6 +18,7 @@ export const createApplication = async (req, res) => {
       phone,
       address,
       reason,
+      shelternotes,
       creator: userId,
       status: "Pending",
     });
@@ -76,7 +77,7 @@ export const editApplication = async (req, res) => {
 
 export const approveApplication = async (req, res) => {
   const { id } = req.params;
-  const { reason } = req.body;
+  const { shelternotes } = req.body;
   try {
     const application = await Application.findById(id);
     if (!application) {
@@ -87,12 +88,12 @@ export const approveApplication = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     application.status = "Approved";
-    application.reason = reason;
+    application.shelternotes = shelternotes;
     await application.save();
     await sendEmail(
       user.email,
       "Application Approved",
-      `Your application has been approved. Reason: ${reason}`
+      `Your application has been approved. Reason: ${shelternotes}`
     );
     res.status(200).json({ message: "Application approved successfully" });
   } catch (error) {
@@ -102,7 +103,7 @@ export const approveApplication = async (req, res) => {
 
 export const rejectApplication = async (req, res) => {
   const { id } = req.params;
-  const { reason } = req.body;
+  const { shelternotes } = req.body;
   try {
     const application = await Application.findById(id);
     if (!application) {
@@ -113,12 +114,12 @@ export const rejectApplication = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     application.status = "Rejected";
-    application.reason = reason;
+    application.shelternotes = shelternotes;
     await application.save();
     await sendEmail(
       user.email,
       "Application Rejected",
-      `Your application has been rejected. Reason: ${reason}`
+      `Your application has been rejected. Reason: ${shelternotes}`
     );
     res.status(200).json({ message: "Application rejected successfully" });
   } catch (error) {
@@ -204,7 +205,7 @@ export const scheduleMeetAndGreet = async (req, res) => {
 
 export const requestAdditionalInfo = async (req, res) => {
   const { id } = req.params;
-  const { message } = req.body;
+  const { shelternotes} = req.body;
   try {
     const application = await Application.findById(id);
     if (!application) {
@@ -219,7 +220,7 @@ export const requestAdditionalInfo = async (req, res) => {
     await sendEmail(
       user.email,
       "Additional Information Needed",
-      message
+      shelternotes
     );
     res.status(200).json({ message: "Request for additional information sent and email notification sent" });
   } catch (error) {
