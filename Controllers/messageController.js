@@ -86,7 +86,7 @@ export const getConversations = async (req, res) => {
 // Get Contact Messages
 export const getContactMessages = async (req, res) => {
   try {
-    const messages = await Message.find({ email: { $exists: true } }); // Only messages with an email field
+    const messages = await Message.find({ email: { $exists: true } }); 
     res.status(200).json(messages);
   } catch (error) {
     res.status(500).json({ message: error.message });
