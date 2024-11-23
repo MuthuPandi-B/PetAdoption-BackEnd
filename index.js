@@ -15,7 +15,10 @@ import fosterPetRoutes from "./Routers/fosterPetRoutes.js";
 dotenv.config();
 const app = express();
 
-app.use(cors());
+app.use(cors({
+     origin: 'https://adopt-a-pets.netlify.app',
+     credentials: true,
+}));
 app.use(express.json());
 connectDB();
 
