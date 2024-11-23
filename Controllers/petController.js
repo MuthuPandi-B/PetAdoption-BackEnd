@@ -1,6 +1,9 @@
+
+
 import Pet from "../Models/petSchema.js";
 import dotenv from "dotenv";
 import User from "../Models/userSchema.js";
+import sendEmail from "../Utils/emailService.js";
 
 dotenv.config();
 
@@ -30,11 +33,52 @@ export const createPet = async (req, res) => {
       petGender,
     });
     await pet.save();
-    res.status(200).json({ message: "Pet created successfully" });
+
+    // Fetch all adopters
+    const adopters = await User.find({ role: "adopter" });
+ 
+
+    // Check if adopters exist
+    if (!adopters || adopters.length === 0) {
+      return res.status(200).json({ message: "Pet created successfully, but no adopters to notify." });
+    }
+
+    // Compose the email content
+    const emailContent = `
+      <p>Dear Adopters,</p>
+      <p>A new pet named "${petName}" has been listed on our platform.</p>
+      <p>Breed: ${petBreed}</p>
+      <p>You can view more details about this pet by visiting <a href="https://yourplatform.com/pets/${pet._id}">this link</a>.</p>
+      <p>Thank you for being a part of our community!</p>
+    `;
+
+    // Send email to all adopters
+    for (const adopter of adopters) {
+      if (adopter.email) {
+        console.log(`Sending email to: ${adopter.email}`); // Debug log
+        await sendEmail(
+           adopter.email,
+         " New Pet Listed for Adoption",
+          ` Dear Adopters,
+      A new pet named "${petName}" has been listed on our platform.
+      Breed: ${petBreed}
+      You can view more details about this pet by visiting :"https://yourplatform.com/pets/${pet._id}"
+      Thank you for being a part of our community!`
+        );
+      } else {
+        console.error(`No email defined for adopter with ID: ${adopter._id}`); // Debug log
+      }
+    }
+
+    res.status(200).json({ message: "Pet created successfully and notifications sent to adopters" });
   } catch (error) {
+    console.error("Error:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
 
 export const getPets = async (req, res) => {
   const { breed, age, size, location } = req.query;
@@ -109,5 +153,57 @@ export const editPet = async (req, res) => {
   }
 };
 
+export const adoptPet = async (req, res) => {
+  const { petId } = req.params;
+  const userId = req.user._id;
 
 
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const pet = await Pet.findById(petId);
+    if (!pet) {
+      return res.status(404).json({ message: "Pet not found" });
+    }
+    const shelter = await User.findOne({role:"shelter"});
+    if (!shelter||!shelter.email) {
+      return res.status(404).json({ message: "Shelter not found" });
+    }
+
+    const shelterEmail =shelter.email; 
+
+    // Compose the email content for the shelter
+  
+
+    // Send email to the shelter
+    await sendEmail(
+      shelterEmail,
+      "New Adoption Request",
+     `Dear Shelter,
+      User ${user.name} wishes to adopt the pet ${pet.petName} with PetId: ${pet._id}
+      For more details Contact user through ${user.email}
+      Thank you!`
+    );
+
+    // Notify the user
+    const emailContentForUser = `
+      <p>Dear ${user.name},</p>
+      <p>Your request to adopt ${pet.petName} has been submitted successfully. We will get back to you soon.</p>
+      <p>Thank you!</p>
+    `;
+
+    await sendEmail(
+      user.email,
+      "Adoption Request Submitted",
+      emailContentForUser
+    );
+
+    res.status(200).json({ message: "Adoption request submitted successfully" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
