@@ -43,14 +43,8 @@ export const createPet = async (req, res) => {
       return res.status(200).json({ message: "Pet created successfully, but no adopters to notify." });
     }
 
-    // Compose the email content
-    const emailContent = `
-      <p>Dear Adopters,</p>
-      <p>A new pet named "${petName}" has been listed on our platform.</p>
-      <p>Breed: ${petBreed}</p>
-      <p>You can view more details about this pet by visiting <a href="https://yourplatform.com/pets/${pet._id}">this link</a>.</p>
-      <p>Thank you for being a part of our community!</p>
-    `;
+  
+
 
     // Send email to all adopters
     for (const adopter of adopters) {
@@ -62,8 +56,10 @@ export const createPet = async (req, res) => {
           ` Dear Adopters,
       A new pet named "${petName}" has been listed on our platform.
       Breed: ${petBreed}
-      You can view more details about this pet by visiting :"https://adopt-a-pets.netlify.app"
-      Thank you for being a part of our community!`
+      You can view more details about this pet by visiting https://adopt-a-pets.netlify.app
+      Thank you for being a part of our community!
+      Regards
+      Adopt-A-Pet Platform`
         );
       } else {
         console.error(`No email defined for adopter with ID: ${adopter._id}`); // Debug log
