@@ -185,20 +185,20 @@ export const adoptPet = async (req, res) => {
      `Dear Shelter,
       User ${user.name} wishes to adopt the pet ${pet.petName} with PetId: ${pet._id}
       For more details Contact user through ${user.email}
-      Thank you!`
+      Thank you!
+      Adopt-A-Pet Platform`
     );
 
     // Notify the user
-    const emailContentForUser = `
-      <p>Dear ${user.name},</p>
-      <p>Your request to adopt ${pet.petName} has been submitted successfully. We will get back to you soon.</p>
-      <p>Thank you!</p>
-    `;
+ 
 
     await sendEmail(
       user.email,
       "Adoption Request Submitted",
-      emailContentForUser
+     `Dear ${user.name}
+     Your request to adopt ${pet.petName} has been submitted successfully. We will get back to you soon.
+     Thank you!
+     Adopt-A-Pet Platform`
     );
 
     res.status(200).json({ message: "Adoption request submitted successfully" });
