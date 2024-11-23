@@ -62,7 +62,7 @@ export const createPet = async (req, res) => {
           ` Dear Adopters,
       A new pet named "${petName}" has been listed on our platform.
       Breed: ${petBreed}
-      You can view more details about this pet by visiting :"https://yourplatform.com/pets/${pet._id}"
+      You can view more details about this pet by visiting :"https://adopt-a-pets.netlify.app"
       Thank you for being a part of our community!`
         );
       } else {

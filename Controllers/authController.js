@@ -70,7 +70,7 @@ export const forgotPassword = async (req, res) => {
             We received a request to reset your password for your account. 
                Please click the link below to set a new password. 
               This link is only valid for the next hour:
-        http://localhost:5173/reset-password/${resetToken}
+       https://adopt-a-pets.netlify.app/reset-password/${resetToken}
         If you didn’t request this, you can ignore this email. Your password will remain unchanged.
 
       Thank you,    
