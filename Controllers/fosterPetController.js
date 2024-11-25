@@ -126,3 +126,15 @@ export const getFosterPetsForFoster = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+ export const deleteFosterPet = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const fosterPet = await FosterPet.findByIdAndDelete(id);
+      if (!fosterPet) {
+        return res.status(404).json({ message: "Foster pet not found" });
+      }
+      res.status(200).json({ message: "Foster pet deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
